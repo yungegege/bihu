@@ -41,20 +41,7 @@ public class LikeController {
         return WendaUtil.getJSONString(0,String.valueOf(likeCount));
     }
 
-    @RequestMapping(value = "/getLikeStatus",method = RequestMethod.POST)
-    public String getLikeStatus(@RequestParam(value = "commentId")int commentId){
-        if (hostHolder.getUser()==null){
-            return WendaUtil.getJSONString(999);
-        }
-        int likeStatus = likeService.getLikeStatus(hostHolder.getUser().getId(),commentId,EntityType.ENTITY_COMMENT);
-        return WendaUtil.getJSONString(likeStatus);
-    }
 
-    @RequestMapping(value = "/getLikeCount",method = RequestMethod.POST)
-    public String getLikeCount(@RequestParam(value = "commentId")int commentId){
-        long likeCount = likeService.getLikeCount(commentId,EntityType.ENTITY_COMMENT);
-        return WendaUtil.getJSONString((int)likeCount);
-    }
 
 
 }
