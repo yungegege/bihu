@@ -5,6 +5,7 @@ import com.linghua.wenda.dao.UserDao;
 import com.linghua.wenda.model.HostHolder;
 import com.linghua.wenda.model.LoginTicket;
 import com.linghua.wenda.model.User;
+import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -20,6 +21,7 @@ import java.util.Date;
  *     postHandle在业务处理器处理请求执行完成后,生成视图之前执行，
  *     afterCompletion在DispatcherServlet完全处理完请求后被调用,可用于清理资源等 。
  */
+@Log4j
 @Component
 public class PassportInterceptor implements HandlerInterceptor {
 
@@ -34,6 +36,8 @@ public class PassportInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
+        String remoteAddr = getIP(httpServletRequest);
+        log.info("ip地址:"+remoteAddr);
         String ticket = null;
         if (httpServletRequest.getCookies()!=null){
             for(Cookie cookie:httpServletRequest.getCookies()){
@@ -65,5 +69,26 @@ public class PassportInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception {
         hostHolder.clear();
+    }
+
+    public static String getIP(HttpServletRequest request) {
+        String ip = request.getHeader("x-forwarded-for");
+        if (!checkIP(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (!checkIP(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (!checkIP(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        return ip;
+    }
+    private static boolean checkIP(String ip) {
+        if (ip == null || ip.length() == 0 || "unkown".equalsIgnoreCase(ip)
+                || ip.split(".").length != 4) {
+            return false;
+        }
+        return true;
     }
 }

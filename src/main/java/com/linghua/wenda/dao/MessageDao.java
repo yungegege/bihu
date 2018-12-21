@@ -18,7 +18,7 @@ public interface MessageDao {
     @Select({"select", SELECT_FILDS, "from", TABLE_NAME, "where conversation_id=#{conversationId} order by created_date desc limit #{offset},#{limit}"})
     List<Message> selectConversationDetail(@Param("conversationId") String conversationId, @Param("offset") int offset, @Param("limit") int limit);
 
-    @Select({"select "+INSERT_FILEDS+" ,count(id) as id from (select * from", TABLE_NAME, "where from_id=#{userId} or to_id=#{userId} order by created_date) tt " +
+    @Select({"select "+INSERT_FILEDS+" ,count(id) as id from (select * from", TABLE_NAME, "where from_id=#{userId} or to_id=#{userId} order by created_date desc) tt " +
             "group by conversation_id order by created_date desc limit #{offset},#{limit}"})
     List<Message> getConversationList(@Param("userId") int userId, @Param("offset") int offset, @Param("limit") int limit);
 

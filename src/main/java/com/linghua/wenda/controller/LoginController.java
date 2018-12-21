@@ -1,9 +1,9 @@
 package com.linghua.wenda.controller;
 
-import com.linghua.wenda.aspect.LogAspect;
-import com.linghua.wenda.model.User;
+import com.linghua.wenda.async.EventModel;
+import com.linghua.wenda.async.EventProducer;
+import com.linghua.wenda.async.EventType;
 import com.linghua.wenda.service.UserService;
-import com.linghua.wenda.util.WendaUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +23,9 @@ import java.util.Map;
 public class LoginController {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
+
+    @Autowired
+    EventProducer eventProducer;
 
     @Autowired
     UserService userService;
@@ -68,17 +71,29 @@ public class LoginController {
                         @RequestParam("password") String password,
                         @RequestParam(value = "next", required = false) String next,
                         @RequestParam(value = "rememberme", defaultValue = "false") boolean rememberme) {
-        Map<String, String> map = userService.login(username, password);
-        if (map.containsKey("ticket")) {
-            Cookie cookie = new Cookie("ticket", map.get("ticket"));
-            cookie.setPath("/");
-            response.addCookie(cookie);
-            if (!StringUtils.isBlank(next)) {
-                return "redirect:/" + next;
+        try {
+            Map<String, String> map = userService.login(username, password);
+            if (map.containsKey("ticket")) {
+                Cookie cookie = new Cookie("ticket", map.get("ticket"));
+                cookie.setPath("/");
+                response.addCookie(cookie);
+
+                EventModel eventModel = new EventModel();
+                eventModel.setType(EventType.LOGIN);
+                eventModel.setExt("email","1250429552@qq.com");
+                eventModel.setExt("username", username);
+                eventProducer.fireEvent(eventModel);
+
+                if (!StringUtils.isBlank(next)) {
+                    return "redirect:/" + next;
+                }
+                return "redirect:/";
+            } else {
+                model.addAttribute("msg", map.get("msg"));
+                return "login";
             }
-            return "redirect:/";
-        } else {
-            model.addAttribute("msg", map.get("msg"));
+        } catch (Exception e) {
+            logger.error("登录异常"+e.getMessage());
             return "login";
         }
 

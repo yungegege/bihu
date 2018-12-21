@@ -49,13 +49,8 @@ public class MessageController {
             vo.set("message",message);
             //显示对方(发或者收都可能)的信息
             int targetId = message.getFromId()==userId?message.getToId():message.getFromId();
-
             vo.set("user",userService.getUserById(targetId));
-            int n = messageService.getConversationUnreadCount(userId,message.getConversationId());
-            if (n>0){
-                vo.set("unread",n);
-            }
-
+            vo.set("unread",messageService.getConversationUnreadCount(userId,message.getConversationId()));
             conversations.add(vo);
         }
         model.addAttribute("vos",conversations);
@@ -71,6 +66,7 @@ public class MessageController {
                 ViewObject vo = new ViewObject();
                 vo.set("message", message);
                 vo.set("user", userService.getUserById(message.getFromId()));
+
                 vos.add(vo);
 
                 //读过消息后把message的status改为1
