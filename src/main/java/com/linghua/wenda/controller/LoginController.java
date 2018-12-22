@@ -77,10 +77,9 @@ public class LoginController {
                 Cookie cookie = new Cookie("ticket", map.get("ticket"));
                 cookie.setPath("/");
                 response.addCookie(cookie);
-
                 EventModel eventModel = new EventModel();
                 eventModel.setType(EventType.LOGIN);
-                eventModel.setExt("email","1250429552@qq.com");
+                eventModel.setExt("email",userService.getUserByName(username).getEmail());
                 eventModel.setExt("username", username);
                 eventProducer.fireEvent(eventModel);
 

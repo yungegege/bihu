@@ -20,9 +20,11 @@ public class LoginExceptionHandler implements EventHandler {
 
     @Override
     public void doHandle(EventModel model) {
-        Map<String,Object> map = new HashMap<>();
-        map.put("username",model.getExt("username"));
-        mailSender.sendWithHTMLTemplate(model.getExt("email"),"登录IP异常","mails/login_exception.html",map);
+        Map<String, Object> map = new HashMap<>();
+        map.put("username", model.getExt("username"));
+        if (!model.getExt("email").equals("")){
+            mailSender.sendWithHTMLTemplate(model.getExt("email"), "欢迎来到逼乎", "mails/login_exception.html", map);
+        }
     }
 
     @Override

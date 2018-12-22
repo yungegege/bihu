@@ -42,6 +42,7 @@ public class UserServiceImpl implements UserService {
         user.setSalt(UUID.randomUUID().toString().substring(0,5));
         user.setHeadUrl(String.format("http://images.nowcoder.com/head/%dt.png",new Random().nextInt(1000)));
         user.setPassword(WendaUtil.MD5(password+user.getSalt()));
+        user.setEmail("");
         userDao.addUser(user);
 
         user = userDao.selectByName(username);

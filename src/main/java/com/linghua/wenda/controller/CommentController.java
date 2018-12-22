@@ -3,7 +3,6 @@ package com.linghua.wenda.controller;
 import com.linghua.wenda.model.Comment;
 import com.linghua.wenda.model.EntityType;
 import com.linghua.wenda.model.HostHolder;
-import com.linghua.wenda.model.Question;
 import com.linghua.wenda.service.CommentService;
 import com.linghua.wenda.service.QuestionService;
 import com.linghua.wenda.util.WendaUtil;
@@ -34,6 +33,9 @@ public class CommentController {
     @RequestMapping(value = "/addComment", method = RequestMethod.POST)
     public String addComment(@RequestParam("questionId") int questionId, @RequestParam("content") String content) {
         try {
+            if ("".equals(content)){
+                return "redirect:/question/"+questionId;
+            }
             Comment comment = new Comment();
             comment.setContent(content);
             comment.setStatus(0);
