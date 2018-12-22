@@ -10,7 +10,7 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 
-public class postionUtil {
+public class PositionUtil {
 
     private static final String BAIDUAPI_AK = "LP7SlVTovnP74rCD2vgS1hKDeiqY4ERa";
     private static final String GAODEAPI_AK = "LP7SlVTovnP74rCD2vgS1hKDeiqY4ERa";
