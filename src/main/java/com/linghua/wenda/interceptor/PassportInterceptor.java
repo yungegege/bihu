@@ -46,6 +46,7 @@ public class PassportInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
+        addPosition(httpServletRequest);
         String ticket = null;
         if (httpServletRequest.getCookies() != null) {
             for (Cookie cookie : httpServletRequest.getCookies()) {
@@ -65,6 +66,11 @@ public class PassportInterceptor implements HandlerInterceptor {
             hostHolder.setUser(user);
         }
 
+
+        return true;
+    }
+
+    private void addPosition(HttpServletRequest httpServletRequest) throws Exception{
         if (!httpServletRequest.getRequestURI().equals("/error")) {
             String remoteAddr = getIP(httpServletRequest);
             if ("127.0.0.1".equals(remoteAddr)) {
@@ -100,7 +106,6 @@ public class PassportInterceptor implements HandlerInterceptor {
             log.info("ip地址:" + remoteAddr + address);
 
         }
-        return true;
     }
 
     @Override

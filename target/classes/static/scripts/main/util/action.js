@@ -146,7 +146,7 @@
             if (oResult.code === 999) {
                 // 未登录
                 alert('未登录');
-                window.location.href = '/reglogin?next=' + window.encodeURI(window.location.href);
+                window.location.href = '/reglogin?next=' + window.encodeURI(window.location.href.replace("http://localhost:8080/",""));
                 return;
             }
             nCode === 0 && oConf.call && oConf.call(oResult);

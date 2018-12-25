@@ -2,7 +2,6 @@ package com.linghua.wenda.util;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
 import com.linghua.wenda.model.baidu.BaiduResponse;
 import com.linghua.wenda.model.gaode.GaodeResponse;
 
@@ -78,12 +77,12 @@ public class PositionUtil {
         return response;
     }
 
-    public static void main(String[] args) throws Exception{
-        String ip = "112.64.196.94";
-        BaiduResponse baiduResonse = getBaiduResonse(ip);
-        GaodeResponse gaodeResponse = gaodeGetCityCode(ip);
-
-        System.out.println(baiduResonse);
-        System.out.println(gaodeResponse);
-    }
+//    public static void main(String[] args) throws Exception{
+//        String ip = "112.64.196.94";
+//        BaiduResponse baiduResonse = getBaiduResonse(ip);
+//        GaodeResponse gaodeResponse = gaodeGetCityCode(ip);
+//
+//        System.out.println(baiduResonse);
+//        System.out.println(gaodeResponse);
+//    }
 }

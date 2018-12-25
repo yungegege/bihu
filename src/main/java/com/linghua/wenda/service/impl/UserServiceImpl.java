@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
     LoginTicketDao loginTicketDao;
 
     @Override
-    public Map<String,String> register(String username,String password) {
+    public Map<String,String> register(String username,String password,String email) {
         Map<String,String> map = new HashMap<>();
         if (StringUtils.isBlank(username)){
             map.put("msg","用户名不能为空");
@@ -32,6 +32,10 @@ public class UserServiceImpl implements UserService {
             map.put("msg","密码不能为空");
             return map;
         }
+//        if (StringUtils.isBlank(password)){
+//            map.put("msg","邮箱不能为空");
+//            return map;
+//        }
         User user = userDao.selectByName(username);
         if (null!=user){
             map.put("msg","用户已经被注册");
@@ -42,7 +46,7 @@ public class UserServiceImpl implements UserService {
         user.setSalt(UUID.randomUUID().toString().substring(0,5));
         user.setHeadUrl(String.format("http://images.nowcoder.com/head/%dt.png",new Random().nextInt(1000)));
         user.setPassword(WendaUtil.MD5(password+user.getSalt()));
-        user.setEmail("");
+        user.setEmail(email);
         userDao.addUser(user);
 
         user = userDao.selectByName(username);

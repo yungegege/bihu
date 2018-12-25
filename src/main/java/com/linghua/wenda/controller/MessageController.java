@@ -38,7 +38,7 @@ public class MessageController {
     @RequestMapping(value = "/msg/list", method = RequestMethod.GET)
     public String getConversationList(Model model) {
         if (null == hostHolder.getUser()) {
-            return "redirect:/reglogin";
+            return "redirect:/regloginreglogin";
         }
         int userId = hostHolder.getUser().getId();
         List<Message> conversationList = messageService.getConversationList(userId, 0, 10);

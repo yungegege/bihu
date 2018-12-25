@@ -34,9 +34,10 @@ public class LoginController {
     public String reg(Model model, HttpServletResponse response,
                       @RequestParam("username") String username,
                       @RequestParam("password") String password,
+                      @RequestParam(value = "email",defaultValue = "") String email,
                       @RequestParam(value = "next", required = false) String next) {
         try {
-            Map<String, String> map = userService.register(username, password);
+            Map<String, String> map = userService.register(username, password,email);
             if (map.containsKey("ticket")) {
                 Cookie cookie = new Cookie("ticket", map.get("ticket"));
                 cookie.setPath("/");
@@ -76,6 +77,9 @@ public class LoginController {
             if (map.containsKey("ticket")) {
                 Cookie cookie = new Cookie("ticket", map.get("ticket"));
                 cookie.setPath("/");
+                if (rememberme) {
+                    cookie.setMaxAge(3600*24*5);
+                }
                 response.addCookie(cookie);
                 EventModel eventModel = new EventModel();
                 eventModel.setType(EventType.LOGIN);
