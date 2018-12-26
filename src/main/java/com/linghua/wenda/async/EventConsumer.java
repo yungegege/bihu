@@ -54,26 +54,31 @@ public class EventConsumer implements InitializingBean,ApplicationContextAware {
             @Override
             public void run() {
                 while (true){
-                    String key = RedisKeyUtil.getEventQueueKey();
-                    List<String> events = jedisUtil.brpop(0,key);
-                    for (String message:events){
-                        //返回的list第一个值为key
-                        if (message.equals(key)){
-                            continue;
+                    try {
+                        String key = RedisKeyUtil.getEventQueueKey();
+                        List<String> events = jedisUtil.brpop(0,key);
+                        for (String message:events){
+                            //返回的list第一个值为key
+                            if (message.equals(key)){
+                                continue;
+                            }
+                            EventModel eventModel = JSON.parseObject(message,EventModel.class);
+                            if (!config.containsKey(eventModel.getType())){
+                                log.error("不能识别的事件");
+                                continue;
+                            }
+                            for (EventHandler eventHandler:config.get(eventModel.getType())){
+                                eventHandler.doHandle(eventModel);
+                            }
                         }
-                        EventModel eventModel = JSON.parseObject(message,EventModel.class);
-                        if (!config.containsKey(eventModel.getType())){
-                            log.error("不能识别的事件");
-                            continue;
-                        }
-                        for (EventHandler eventHandler:config.get(eventModel.getType())){
-                            eventHandler.doHandle(eventModel);
-                        }
+                    }catch (Exception e){
+                        log.error("EventConsumer error "+e.getMessage());
                     }
+
                 }
             }
         });
-
+        thread.setDaemon(true);
         thread.start();
     }
 

@@ -39,14 +39,14 @@ public class LoginController {
     @Autowired
     JedisUtil jedisUtill;
 
-    @RequestMapping(path = "/reglogin", method = RequestMethod.GET)
+    @RequestMapping(path = "/toLogin", method = RequestMethod.GET)
     public String toLogin(Model model, @RequestParam(value = "next", required = false) String next) {
         model.addAttribute("next", next);
         return "login";
     }
 
     @RequestMapping(path = "/toReg", method = RequestMethod.GET)
-    public String toReg() {
+    public String toReg(Model model) {
         return "register";
     }
 
@@ -59,24 +59,7 @@ public class LoginController {
         try {
             Map<String, String> map = userService.register(username, password, email);
             if (map.containsKey("userId")) {
-                //往redis存激活码
-                String key = RedisKeyUtil.getActiveKey(username);
-                Random random = new Random();
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < 15; i++) {
-                    sb.append(random.nextInt(10));
-                }
-                String code = sb.toString();
-                jedisUtill.add(key, code);
-                //发激活邮件
-                EventModel eventModel = new EventModel();
-                eventModel.setType(EventType.REGISTER);
-                eventModel.setExt("email", userService.getUserByName(username).getEmail());
-                eventModel.setExt("username", username);
-                username = URLEncoder.encode(username, "utf-8");
-                eventModel.setExt("url", "http://127.0.0.1:8080/activeUser?username=" + username + "&code=" + code);
-                eventProducer.fireEvent(eventModel);
-
+                sendActiveEmail(username);
                 model.addAttribute("msg", "请进入邮箱激活账户");
                 if (!StringUtils.isBlank(next)) {
                     return "register";
@@ -92,6 +75,26 @@ public class LoginController {
             logger.error("注册异常" + e.getMessage());
             return "register";
         }
+    }
+
+    private void sendActiveEmail(String username) throws Exception {
+        //往redis存激活码
+        String key = RedisKeyUtil.getActiveKey(username);
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 15; i++) {
+            sb.append(random.nextInt(10));
+        }
+        String code = sb.toString();
+        jedisUtill.add(key, code);
+        //发激活邮件
+        EventModel eventModel = new EventModel();
+        eventModel.setType(EventType.REGISTER);
+        eventModel.setExt("email", userService.getUserByName(username).getEmail());
+        username = URLEncoder.encode(username, "utf-8");
+        eventModel.setExt("username", username);
+        eventModel.setExt("url", "http://127.0.0.1:8080/activeUser?username=" + username + "&code=" + code);
+        eventProducer.fireEvent(eventModel);
     }
 
 
@@ -111,7 +114,8 @@ public class LoginController {
         User user = userService.getUserByName(username);
         user.setStatus(1);
         userService.updateStatus(user);
-        return "redirect:/reglogin";
+        model.addAttribute("msg","您的账户已经激活，请开启装逼之路！");
+        return "login";
     }
 
     @RequestMapping(path = "/login", method = RequestMethod.POST)
@@ -129,15 +133,13 @@ public class LoginController {
                     cookie.setMaxAge(3600 * 24 * 5);
                 }
                 response.addCookie(cookie);
-
-
                 if (!StringUtils.isBlank(next)) {
                     return "redirect:/" + next;
                 }
                 return "redirect:/";
             } else {
                 model.addAttribute("msg", map.get("msg"));
-                return "login";
+                return "register";
             }
         } catch (Exception e) {
             logger.error("登录异常" + e.getMessage());

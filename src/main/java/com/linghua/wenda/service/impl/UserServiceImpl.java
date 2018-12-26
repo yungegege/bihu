@@ -27,71 +27,73 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Map<String,String> register(String username,String password,String email) {
-        Map<String,String> map = new HashMap<>();
-        if (StringUtils.isBlank(username)){
-            map.put("msg","用户名不能为空");
+    public Map<String, String> register(String username, String password, String email) {
+        Map<String, String> map = new HashMap<>();
+        if (StringUtils.isBlank(username)) {
+            map.put("msg", "用户名不能为空");
             return map;
         }
-        if (StringUtils.isBlank(password)){
-            map.put("msg","密码不能为空");
+        if (StringUtils.isBlank(password)) {
+            map.put("msg", "密码不能为空");
             return map;
         }
-        if (StringUtils.isBlank(password)){
-            map.put("msg","邮箱不能为空");
+        if (StringUtils.isBlank(password)) {
+            map.put("msg", "邮箱不能为空");
             return map;
         }
         User user = userDao.selectByName(username);
-        if (null!=user){
-            map.put("msg","用户已经被注册");
+        //不为空而且已激活
+        if (null != user && user.getStatus() == 1) {
+            map.put("msg", "用户已经被注册");
             return map;
         }
-        user = new User();
-        user.setName(username);
-        user.setSalt(UUID.randomUUID().toString().substring(0,5));
-        user.setHeadUrl(String.format("http://images.nowcoder.com/head/%dt.png",new Random().nextInt(1000)));
-        user.setPassword(WendaUtil.MD5(password+user.getSalt()));
-        user.setEmail(email);
-        user.setStatus(0);
-        userDao.addUser(user);
+        //为空就添加进去
+        if (user==null){
+            user = new User();
+            user.setName(username);
+            user.setSalt(UUID.randomUUID().toString().substring(0, 5));
+            user.setHeadUrl(String.format("http://images.nowcoder.com/head/%dt.png", new Random().nextInt(1000)));
+            user.setEmail(email);
+            user.setStatus(0);
+            userDao.addUser(user);
+        }
+        user.setPassword(WendaUtil.MD5(password + user.getSalt()));
         user = userDao.selectByName(username);
-//        String ticket = addLoginTicket(user.getId());
-//        map.put("ticket",ticket);
-        map.put("userId",String.valueOf(user.getId()));
+        map.put("userId", String.valueOf(user.getId()));
         return map;
     }
 
-    public Map<String,String> login(String username,String password){
-        Map<String,String> map = new HashMap<>();
-        if (StringUtils.isBlank(username)){
-            map.put("msg","用户名不能为空");
+    public Map<String, String> login(String username, String password) {
+        Map<String, String> map = new HashMap<>();
+        if (StringUtils.isBlank(username)) {
+            map.put("msg", "用户名不能为空");
             return map;
         }
-        if (StringUtils.isBlank(password)){
-            map.put("msg","密码不能为空");
+        if (StringUtils.isBlank(password)) {
+            map.put("msg", "密码不能为空");
             return map;
         }
         User user = userDao.selectByName(username);
-        if (null==user){
-            map.put("msg","用户不存在");
+        if (null == user) {
+            map.put("msg", "用户不存在");
             return map;
         }
-        if (!user.getPassword().equals(WendaUtil.MD5(password+user.getSalt()))){
-            map.put("msg","密码错误");
+        if (!user.getPassword().equals(WendaUtil.MD5(password + user.getSalt()))) {
+            map.put("msg", "密码错误");
             return map;
         }
-        if (user.getStatus()!=1){
-            map.put("msg","用户未激活");
+        if (user.getStatus() != 1) {
+            map.put("msg", "用户未激活,请重新注册激活用户");
             return map;
         }
         String ticket = addLoginTicket(user.getId());
-        map.put("ticket",ticket);
+        map.put("ticket", ticket);
         return map;
 
     }
 
     @Override
-    public User getUserById(int userId){
+    public User getUserById(int userId) {
         return userDao.selectById(userId);
     }
 
@@ -100,21 +102,21 @@ public class UserServiceImpl implements UserService {
         userDao.updatePassword(user);
     }
 
-    public String addLoginTicket(int userId){
+    public String addLoginTicket(int userId) {
         LoginTicket loginTicket = new LoginTicket();
         loginTicket.setUserId(userId);
         Date date = new Date();
-        date.setTime(date.getTime()+2*1000*24*3600);
+        date.setTime(date.getTime() + 2 * 1000 * 24 * 3600);
         loginTicket.setExpired(date);
         loginTicket.setStatus(0);
-        loginTicket.setTicket(UUID.randomUUID().toString().replaceAll("-",""));
+        loginTicket.setTicket(UUID.randomUUID().toString().replaceAll("-", ""));
         loginTicketDao.addTicket(loginTicket);
         return loginTicket.getTicket();
     }
 
     @Override
     public void logout(String ticket) {
-        loginTicketDao.updateStatus(ticket,1);
+        loginTicketDao.updateStatus(ticket, 1);
     }
 
     @Override
