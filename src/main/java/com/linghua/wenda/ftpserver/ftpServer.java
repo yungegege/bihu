@@ -38,7 +38,7 @@ public class ftpServer implements InitializingBean {
         //密码 如果不设置密码就是匿名用户
         user.setPassword("123456");
         //用户主目录
-        user.setHomeDirectory("/usr/local/tomcat/apache-tomcat-8.5.37/logs/");
+        user.setHomeDirectory("/");
 
         List<Authority> authorities = new ArrayList<Authority>();
         //增加写权限
@@ -48,6 +48,8 @@ public class ftpServer implements InitializingBean {
         //增加该用户
         serverFactory.getUserManager().save(user);
         server = serverFactory.createServer();
+        server.start();
+
 
         /**
          * 也可以使用配置文件来管理用户
@@ -58,10 +60,9 @@ public class ftpServer implements InitializingBean {
     }
 
 
-    @PostConstruct
+//    @PostConstruct
     public void init() {
         try {
-            server.start();
         } catch (Exception e) {
             log.error("ftp server start error " + e.getMessage());
         }
