@@ -48,9 +48,6 @@ public class LoginController {
         try {
             Map<String, String> map = userService.register(username, password, email);
             if (map.containsKey("userId")) {
-//                Cookie cookie = new Cookie("ticket", map.get("ticket"));
-//                cookie.setPath("/");
-//                response.addCookie(cookie);
                 //往redis存激活码
                 String key = RedisKeyUtil.getActiveKey(username);
                 Random random = new Random();
@@ -99,8 +96,7 @@ public class LoginController {
             model.addAttribute("msg", "激活码错误");
             return "register";
         }
-
-        //激活成功该状态
+        //激活成功改状态
         User user = userService.getUserByName(username);
         user.setStatus(1);
         userService.updateStatus(user);
