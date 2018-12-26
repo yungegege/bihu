@@ -21,7 +21,7 @@ public class RegisterValidateHandler implements EventHandler {
         Map<String,Object> map = new HashMap<>();
         map.put("username",model.getExt("username"));
         map.put("url",model.getExt("url"));
-        mailSender.sendWithHTMLTemplate(model.getExt("email"),"激活您的账号","mails/register_validate.html",map);
+        mailSender.sendWithHTMLTemplate(model.getExt("email"),"激活您的账号","mails/register_activate.html",map);
     }
 
     @Override

@@ -18,4 +18,6 @@ public interface UserService {
     User getUserByName(String name);
 
     void logout(String ticket);
+
+    void updateStatus(User user);
 }

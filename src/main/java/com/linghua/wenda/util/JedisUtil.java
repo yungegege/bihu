@@ -1,5 +1,6 @@
 package com.linghua.wenda.util;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -25,6 +26,41 @@ public class JedisUtil implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         pool = new JedisPool("localhost",6379);
+    }
+
+    public String add(String key,String value){
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            boolean keyExist = jedis.exists(key);
+            if (keyExist) {
+                jedis.del(key);
+            }
+            // NX是不存在时才set， XX是存在时才set， EX是秒，PX是毫秒
+            return jedis.set(key,value,"NX","EX",30*60);
+        }catch (Exception e){
+            logger.error("发生异常"+e.getMessage());
+        }finally {
+            if (jedis!=null){
+                jedis.close();
+            }
+        }
+        return StringUtils.EMPTY;
+    }
+
+    public String get(String key){
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            return jedis.get(key);
+        }catch (Exception e){
+            logger.error("发生异常"+e.getMessage());
+        }finally {
+            if (jedis!=null){
+                jedis.close();
+            }
+        }
+        return StringUtils.EMPTY;
     }
 
     public long sadd(String key,String value){

@@ -6,6 +6,7 @@ public class RedisKeyUtil {
     private static String LIKE = "like";
     private static String DISLIKE = "disLike";
     private static String EVENTQUEUE = "eventqueue";
+    private static String ACTIVEKEY = "active";
 
     public static String getLikeKey(int entityId,int entityType){
         return LIKE+SPILT+entityId+SPILT+entityType;
@@ -16,5 +17,9 @@ public class RedisKeyUtil {
     }
     public static String getEventQueueKey(){
         return EVENTQUEUE;
+    }
+
+    public static String getActiveKey(String username){
+        return ACTIVEKEY+SPILT+username;
     }
 }

@@ -22,13 +22,18 @@ public class LoginExceptionHandler implements EventHandler {
     public void doHandle(EventModel model) {
         Map<String, Object> map = new HashMap<>();
         map.put("username", model.getExt("username"));
-        if (!model.getExt("email").equals("")){
-            mailSender.sendWithHTMLTemplate(model.getExt("email"), "欢迎来到逼乎", "mails/login_exception.html", map);
+        if (!model.getExt("email").equals("")) {
+            if (model.getType().equals(EventType.REGISTER)) {
+                map.put("url",model.getExt("url"));
+                mailSender.sendWithHTMLTemplate(model.getExt("email"), "欢迎注册逼乎", "mails/register_activate.html", map);
+            } else {
+                mailSender.sendWithHTMLTemplate(model.getExt("email"), "欢迎登录逼乎", "mails/login_validate.html", map);
+            }
         }
     }
 
     @Override
     public List<EventType> getSupportEventTypes() {
-        return Arrays.asList(EventType.LOGIN);
+        return Arrays.asList(EventType.REGISTER, EventType.LOGIN);
     }
 }

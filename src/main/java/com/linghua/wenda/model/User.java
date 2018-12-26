@@ -9,5 +9,6 @@ public class User {
     private String salt;
     private String headUrl;
     private String email;
+    private int status;
 
 }

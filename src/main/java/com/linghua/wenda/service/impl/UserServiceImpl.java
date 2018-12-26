@@ -22,6 +22,11 @@ public class UserServiceImpl implements UserService {
     LoginTicketDao loginTicketDao;
 
     @Override
+    public void updateStatus(User user) {
+        userDao.updateStatus(user);
+    }
+
+    @Override
     public Map<String,String> register(String username,String password,String email) {
         Map<String,String> map = new HashMap<>();
         if (StringUtils.isBlank(username)){
@@ -32,10 +37,10 @@ public class UserServiceImpl implements UserService {
             map.put("msg","密码不能为空");
             return map;
         }
-//        if (StringUtils.isBlank(password)){
-//            map.put("msg","邮箱不能为空");
-//            return map;
-//        }
+        if (StringUtils.isBlank(password)){
+            map.put("msg","邮箱不能为空");
+            return map;
+        }
         User user = userDao.selectByName(username);
         if (null!=user){
             map.put("msg","用户已经被注册");
@@ -47,11 +52,12 @@ public class UserServiceImpl implements UserService {
         user.setHeadUrl(String.format("http://images.nowcoder.com/head/%dt.png",new Random().nextInt(1000)));
         user.setPassword(WendaUtil.MD5(password+user.getSalt()));
         user.setEmail(email);
+        user.setStatus(0);
         userDao.addUser(user);
-
         user = userDao.selectByName(username);
-        String ticket = addLoginTicket(user.getId());
-        map.put("ticket",ticket);
+//        String ticket = addLoginTicket(user.getId());
+//        map.put("ticket",ticket);
+        map.put("userId",String.valueOf(user.getId()));
         return map;
     }
 
@@ -72,6 +78,10 @@ public class UserServiceImpl implements UserService {
         }
         if (!user.getPassword().equals(WendaUtil.MD5(password+user.getSalt()))){
             map.put("msg","密码错误");
+            return map;
+        }
+        if (user.getStatus()!=1){
+            map.put("msg","用户未激活");
             return map;
         }
         String ticket = addLoginTicket(user.getId());
@@ -111,4 +121,6 @@ public class UserServiceImpl implements UserService {
     public User getUserByName(String name) {
         return userDao.selectByName(name);
     }
+
+
 }
