@@ -39,6 +39,17 @@ public class LoginController {
     @Autowired
     JedisUtil jedisUtill;
 
+    @RequestMapping(path = "/reglogin", method = RequestMethod.GET)
+    public String toLogin(Model model, @RequestParam(value = "next", required = false) String next) {
+        model.addAttribute("next", next);
+        return "login";
+    }
+
+    @RequestMapping(path = "/toReg", method = RequestMethod.GET)
+    public String toReg() {
+        return "register";
+    }
+
     @RequestMapping(path = "/reg", method = RequestMethod.POST)
     public String reg(Model model, HttpServletRequest request,
                       @RequestParam("username") String username,
@@ -103,19 +114,6 @@ public class LoginController {
         return "redirect:/reglogin";
     }
 
-
-    @RequestMapping(path = "/reglogin", method = RequestMethod.GET)
-    public String toLogin(Model model, @RequestParam(value = "next", required = false) String next) {
-        model.addAttribute("next", next);
-        return "login";
-    }
-
-    @RequestMapping(path = "/toReg", method = RequestMethod.GET)
-    public String toReg() {
-        return "register";
-    }
-
-
     @RequestMapping(path = "/login", method = RequestMethod.POST)
     public String login(Model model, HttpServletResponse response,
                         @RequestParam("username") String username,
@@ -147,7 +145,6 @@ public class LoginController {
         }
 
     }
-
 
     @RequestMapping(path = "/logout", method = RequestMethod.GET)
     public String logout(@CookieValue("ticket") String ticket) {
