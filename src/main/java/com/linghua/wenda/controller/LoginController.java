@@ -93,7 +93,7 @@ public class LoginController {
         eventModel.setExt("email", userService.getUserByName(username).getEmail());
         username = URLEncoder.encode(username, "utf-8");
         eventModel.setExt("username", username);
-        eventModel.setExt("url", "http://127.0.0.1:8080/activeUser?username=" + username + "&code=" + code);
+        eventModel.setExt("url", "http://112.74.161.58:8080/activeUser?username=" + username + "&code=" + code);
         eventProducer.fireEvent(eventModel);
     }
 
@@ -103,18 +103,18 @@ public class LoginController {
         String key = RedisKeyUtil.getActiveKey(username);
         String value = jedisUtill.get(key);
         if (StringUtils.isBlank(value)) {
-            model.addAttribute("msg", "激活码过期");
+            model.addAttribute("msg", "激活码过期,请重新注册");
             return "register";
         }
         if (!value.equals(code)) {
-            model.addAttribute("msg", "激活码错误");
+            model.addAttribute("msg", "激活码错误,请重新注册");
             return "register";
         }
         //激活成功改状态
         User user = userService.getUserByName(username);
         user.setStatus(1);
         userService.updateStatus(user);
-        model.addAttribute("msg","您的账户已经激活，请开启装逼之路！");
+        model.addAttribute("msg", "您的账户已经激活，请开启装逼之路！");
         return "login";
     }
 
@@ -134,13 +134,15 @@ public class LoginController {
                 }
                 response.addCookie(cookie);
                 if (!StringUtils.isBlank(next)) {
-                    return "redirect:/" + next;
+                    return "redirect:" + next;
                 }
                 return "redirect:/";
-            } else {
-                model.addAttribute("msg", map.get("msg"));
+            }
+            model.addAttribute("msg", map.get("msg"));
+            if (map.get("msg").equals("用户未激活,请重新注册激活用户")) {
                 return "register";
             }
+            return "login";
         } catch (Exception e) {
             logger.error("登录异常" + e.getMessage());
             return "login";

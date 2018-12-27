@@ -55,9 +55,14 @@ public class UserServiceImpl implements UserService {
             user.setHeadUrl(String.format("http://images.nowcoder.com/head/%dt.png", new Random().nextInt(1000)));
             user.setEmail(email);
             user.setStatus(0);
+            user.setPassword(WendaUtil.MD5(password + user.getSalt()));
             userDao.addUser(user);
+        }else {
+            //未激活
+            userDao.updateStatus(user);
+            userDao.updatePassword(user);
         }
-        user.setPassword(WendaUtil.MD5(password + user.getSalt()));
+
         user = userDao.selectByName(username);
         map.put("userId", String.valueOf(user.getId()));
         return map;
