@@ -27,7 +27,7 @@ public class HomeController {
 
     @RequestMapping(path = {"/", "/index"}, method = {RequestMethod.GET, RequestMethod.POST})
     public String index(Model model) {
-        model.addAttribute("vos", getQuestions(0, 0, 10));
+        model.addAttribute("vos", getQuestions(0, 0, 20));
         return "index";
     }
 
@@ -43,6 +43,7 @@ public class HomeController {
         List<ViewObject> vos = new ArrayList<>();
         for (Question question : list) {
             ViewObject vo = new ViewObject();
+            question.setContent(question.getContent().substring(0,100));
             vo.set("question", question);
             vo.set("user", userService.getUserById(question.getUserId()));
             vos.add(vo);
